@@ -26,13 +26,7 @@ namespace WindowsFormsApplication1
         public Form1()
         {
             InitializeComponent();
-            ini.path = gPath + "\\seting.ini";
-            
         }
-
-        //public string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        
-
         private void Form1_Load(object sender, EventArgs e)
         {
             if (!Directory.Exists(gPath))

@@ -83,7 +83,6 @@ namespace BuildCreator
 
         private void allLibsList_Click(object sender, EventArgs e)
         {
-            //LibList libList = new LibList();
             List<Lib> libList = new List<Lib>();
             foreach (string libPath in Directory.GetFiles(gamePath + "libraries\\", "*.jar"))
             {
@@ -91,7 +90,6 @@ namespace BuildCreator
                 libInfo.name = new FileInfo(libPath).Name;
                 libInfo.hash = ComputeMD5Checksum(libPath);
                 libList.Add(libInfo);
-                //libList.itemList.Add(libInfo);
             }
             string outPut = jss.Serialize(libList);
             MessageBox.Show(outPut);

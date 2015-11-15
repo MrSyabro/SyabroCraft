@@ -57,8 +57,7 @@ namespace System
                     shaders = " --tweakClass shadersmodcore.loading.SMCTweaker";
 
                 string MineLib = string.Join("\";\"", Directory.GetFiles(SetingClass.pDir + "\\" + SetingClass.gDir + "\\libraries", "*.jar", SearchOption.AllDirectories));
-                proc.StartInfo.Arguments = SetingClass.dopArguments + " -Xmx" + SetingClass.sram + " -Dfml.ignoreInvalidMinecraftCertificates=true -Dfml.ignorePatchDiscrepancies=true -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:-UseAdaptiveSizePolicy -Xmn128M -Djava.library.path=\"" + SetingClass.pDir + "\\" + SetingClass.gDir + "\\bin\\natives\" -cp \"" + MineLib + "\";\"" + SetingClass.pDir + "\\" + SetingClass.gDir + "\\bin\\minecraft.jar\" net.minecraft.launchwrapper.Launch --username " + SetingClass.login + " --gameDir \"" + SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + "\" --version \"" + SetingClass.selectedBuild.Name + "\" --assetsDir \"" + SetingClass.pDir + "\\" + SetingClass.gDir + "\\assets\" --assetIndex " + "1.7.10" + " --accessToken " + SetingClass.accessToken + " --uuid " + SetingClass.uuid + " --userProperties [] --userType mojang --tweakClass com.mumfrey.liteloader.launch.LiteLoaderTweaker " + forge + server + shaders; // --tweakClass cpw.mods.fml.common.launcher.FMLTweaker   --tweakClass com.mumfrey.liteloader.launch.LiteLoaderTweaker --uuid ${auth_uuid} --accessToken ${auth_access_token} --userProperties ${user_properties} --userType ${user_type} 
-                //MessageBox.Show(proc.StartInfo.Arguments);
+                proc.StartInfo.Arguments = SetingClass.dopArguments + " -Xmx" + SetingClass.sram + " -Dfml.ignoreInvalidMinecraftCertificates=true -Dfml.ignorePatchDiscrepancies=true -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:-UseAdaptiveSizePolicy -Xmn128M -Djava.library.path=\"" + SetingClass.pDir + "\\" + SetingClass.gDir + "\\bin\\natives\" -cp \"" + MineLib + "\";\"" + SetingClass.pDir + "\\" + SetingClass.gDir + "\\bin\\minecraft.jar\" net.minecraft.launchwrapper.Launch --username " + SetingClass.login + " --gameDir \"" + SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + "\" --version \"" + SetingClass.selectedBuild.Name + "\" --assetsDir \"" + SetingClass.pDir + "\\" + SetingClass.gDir + "\\assets\" --assetIndex " + "1.7.10" + " --accessToken " + SetingClass.accessToken + " --uuid " + SetingClass.uuid + " --userProperties [] --userType mojang --tweakClass com.mumfrey.liteloader.launch.LiteLoaderTweaker " + forge + server + shaders;
                 proc.StartInfo.RedirectStandardOutput = true;
                 proc.StartInfo.RedirectStandardError = true;
                 proc.StartInfo.RedirectStandardInput = true;
@@ -98,22 +97,6 @@ namespace System
                     DownloadBuild.ReportProgress(0, "Загрузка " + item.name);
                     client.DownloadFile(SetingClass.repoLink + item.sitePath, SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + item.localPath);
                 }
-
-                //client.DownloadFile(SetingClass.repoLink + "builds/" + SetingClass.selectedBuild.ID + ".build", SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + ".build");
-                //string[] fileLists = File.ReadAllLines(SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + ".build");
-                //foreach (string file in fileLists)
-                //{
-                //    client.DownloadFile(SetingClass.repoLink + "builds/" + SetingClass.selectedBuild.ID + "/" + file + ".ver", SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + "\\" + file + ".build");
-                //    string[] fileList = File.ReadAllLines(SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + "\\" + file + ".build");
-                //    Directory.CreateDirectory(SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + "\\" + file);
-                //    foreach (string file2 in fileList)
-                //    {
-                //        client.DownloadFile(SetingClass.repoLink + "builds/" + file + "/" + file2, SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + "\\" + file + "\\" + file2);
-                //    }
-                //    File.Delete(SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + "\\" + file + ".build");
-                //}
-                //File.Delete(SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + ".build");
-                
             }
             catch (Exception ex)
             {
@@ -178,21 +161,6 @@ namespace System
                         File.Delete(fileName);
                     }
                 }
-
-                //client.DownloadFile(SetingClass.repoLink + "builds/" + SetingClass.selectedBuild.ID + ".build", SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + ".build");
-                //string[] fileLists = File.ReadAllLines(SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + ".build");
-                //foreach (string file in fileLists)
-                //{
-                //    client.DownloadFile(SetingClass.repoLink + "builds/" + SetingClass.selectedBuild.ID + "/" + file + ".ver", SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + "\\" + file + ".build");
-                //    string[] fileList = File.ReadAllLines(SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + "\\" + file + ".build");
-                //    Directory.CreateDirectory(SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + "\\" + file);
-                //    foreach (string file2 in fileList)
-                //    {
-                //        client.DownloadFile(SetingClass.repoLink + "builds/" + file + "/" + file2, SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + "\\" + file + "\\" + file2);
-                //    }
-                //    File.Delete(SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + "\\" + file + ".build");
-                //}
-                //File.Delete(SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + ".build");
             }
             catch (Exception ex)
             {
@@ -221,7 +189,6 @@ namespace System
         private void DownloadBuild_ProgressChanged(object sender, ComponentModel.ProgressChangedEventArgs e)
         {
             label2.Text = e.UserState as String;
-            //progressBar1.Value = e.ProgressPercentage;
         }
     }
     class BuildInfo
