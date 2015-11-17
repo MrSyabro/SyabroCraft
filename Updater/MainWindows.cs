@@ -5,7 +5,6 @@ using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using System.Web.Script.Serialization;
@@ -18,54 +17,32 @@ namespace WindowsFormsApplication1
         public string gPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SyabroCraft";
         WebClient client = new WebClient();
         Process proc = new Process();
-        INI ini = new INI();
         JavaScriptSerializer jss = new JavaScriptSerializer();
         public string repoLinc = @"http://syabrocraft.xyz/wp-content/minecraft/";
         public string versLinc = @"http://syabrocraft.xyz/wp-content/plugins/syabrocraft/version_change.php";
         public Uri libLinc;
+        //FileStream logFile = File.OpenWrite(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SyabroCraft\\LauncherLog.log");
+        StreamWriter logFile = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SyabroCraft\\LauncherLog.log", true);
+
         public Form1()
         {
             InitializeComponent();
         }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             if (!Directory.Exists(gPath))
             {
                 label2.Text = "Загрузка файлов...";
+                writeToLog("[" + DateTime.Today + "]: Запуск фоновой загрузки файлов.");
                 backgroundWorker1.RunWorkerAsync();
             }
             else
             {
                 label2.Text = "Проверка...";
+                writeToLog("[" + DateTime.Today + "]: Запуск фоновой проверки файлов и обновлений.");
                 backgroundWorker2.RunWorkerAsync();
             }
-        }
-        
-        class INI
-        { 
-             public string path;
-
-            [DllImport("kernel32")] 
-            private static extern long WritePrivateProfileString(string section, string key, string val, string filePath);
-            [DllImport("kernel32")] 
-            private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath); 
-
-            public void IniWriteValue(string Section, string Key, string Value) 
-            { 
-                   if(!Directory.Exists(Path.GetDirectoryName(path))) 
-                         Directory.CreateDirectory(Path.GetDirectoryName(path)); 
-                   if(!File.Exists(path)) 
-                          using (File.Create(path)) { }; 
-
-                   WritePrivateProfileString(Section, Key, Value, this.path); 
-            } 
-
-           public string IniReadValue(string Section, string Key) 
-           { 
-                 StringBuilder temp = new StringBuilder(255); 
-                 int i = GetPrivateProfileString(Section, Key, "", temp, 255, this.path); 
-                 return temp.ToString(); 
-           } 
         }
 
         private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
@@ -80,9 +57,8 @@ namespace WindowsFormsApplication1
                 {
                     libLinc = new Uri(repoLinc + "libraries32.json");
                 }
-                Directory.CreateDirectory(gPath);
-                Directory.CreateDirectory(gPath + "\\libraries\\");
-
+                Directory.CreateDirectory(gPath + "\\libraries\\"); writeToLog("[" + DateTime.Today + "]: Создание папки " + gPath + "\\libraries\\");
+                
                 HttpWebRequest libsListWebRequest = (HttpWebRequest)WebRequest.Create(libLinc);
                 HttpWebResponse libsListWebResponse = (HttpWebResponse)libsListWebRequest.GetResponse();
                 Stream ReceiveStream = libsListWebResponse.GetResponseStream();
@@ -108,7 +84,7 @@ namespace WindowsFormsApplication1
                         Directory.CreateDirectory(new FileInfo(gPath + "\\assets\\" + asset).DirectoryName);
                     client.DownloadFile(repoLinc + "assets/" + asset.Replace(@"\\", "/"), gPath + "\\assets\\" + asset.Replace(".asset", ""));
                 }
-
+                
                 backgroundWorker1.ReportProgress(0, "Загрузка архивов...");
                 client.DownloadFile(new Uri(repoLinc + "mCore.zip"), gPath + "\\mCore.zip");
                 client.DownloadFile(new Uri(repoLinc + "lCore.zip"), gPath + "\\lCore.zip");
@@ -132,9 +108,21 @@ namespace WindowsFormsApplication1
                 setings.accessToken = "";
                 setings.shaders = false;
                 setings.forge = true;
+                setings.mLogs = false;
                 File.WriteAllText(gPath + "\\seting.json", jss.Serialize(setings));
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Ошибка при попытке установки");}
+            catch (Exception ex) {
+                MessageBox.Show("Произошла ошибка, пожалуйста, отправте файл логов \"...\\Roaming\\SyabroCraft\\LauncherLog.log\" на форум разработчика.");
+                writeToLog("[" + DateTime.Today + "]: Произошал ошибка: ");
+                writeToLog("Сообщение: " + ex.Message);
+                writeToLog("Исключение из: " + ex.TargetSite);
+                writeToLog("Информация: " + ex.Data);
+                writeToLog("Стек: " + ex.StackTrace);
+                Process.Start(gPath);
+                Process.Start("http://syabrocraft.xyz/forums/forum/%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81-%D0%BE%D1%82%D0%B2%D0%B5%D1%82/");
+                logFile.Close();
+                Close();
+            }
         }
 
         private void Form1_MouseMove(object sender, MouseEventArgs e)
@@ -154,10 +142,12 @@ namespace WindowsFormsApplication1
                 if (Environment.Is64BitOperatingSystem)
                 {
                     libLinc = new Uri(repoLinc + "libraries64.json");
-                } else
+                }
+                else
                 {
                     libLinc = new Uri(repoLinc + "libraries32.json");
                 }
+
                 if (!Directory.Exists(gPath + "\\libraries"))
                 {
                     HttpWebRequest libsListWebRequest = (HttpWebRequest)WebRequest.Create(libLinc);
@@ -168,7 +158,7 @@ namespace WindowsFormsApplication1
                     List<Lib> libList = jss.Deserialize<List<Lib>>(libListJSON);
                     foreach (Lib lib in libList)
                     {
-                        backgroundWorker2.ReportProgress(0, lib.name);
+                        backgroundWorker1.ReportProgress(0, lib.name);
                         client.DownloadFile(repoLinc + "libs/" + lib.name, gPath + "\\libraries\\" + lib.name);
                     }
                 }
@@ -196,9 +186,10 @@ namespace WindowsFormsApplication1
                             
                     }
                 }
+
                 if (!Directory.Exists(gPath + "\\assets"))
                 {
-                    backgroundWorker2.ReportProgress(0, "Загрузка ресурсов...");
+                    backgroundWorker1.ReportProgress(0, "Загрузка ресурсов...");
                     HttpWebRequest assetsListWebRequest = (HttpWebRequest)WebRequest.Create(repoLinc + "/assets.json");
                     HttpWebResponse assetsListWebResponse = (HttpWebResponse)assetsListWebRequest.GetResponse();
                     Stream ReceiveStream = assetsListWebResponse.GetResponseStream();
@@ -212,6 +203,7 @@ namespace WindowsFormsApplication1
                         client.DownloadFile(repoLinc + "assets/" + asset.Replace(@"\\", "/"), gPath + "\\assets\\" + asset.Replace(".asset", ""));
                     }
                 }
+
                 if (!Directory.Exists(gPath + "\\bin"))
                 {
                     backgroundWorker2.ReportProgress(0, "Загрузка архива...");
@@ -228,8 +220,10 @@ namespace WindowsFormsApplication1
                     ZipFile.ExtractToDirectory(gPath + "\\lCore.zip", gPath);
                     File.Delete(gPath + "\\lCore.zip");
                 }
+
                 int siteLauncherVer = Convert.ToInt32(POST(versLinc, "name=launcher"));
                 int siteCoreVer = Convert.ToInt32(POST(versLinc, "name=core"));
+
                 if (!File.Exists(gPath + "\\seting.json"))
                 {
                     SerSetingsClass setings = new SerSetingsClass();
@@ -243,6 +237,7 @@ namespace WindowsFormsApplication1
                     setings.accessToken = "";
                     setings.shaders = false;
                     setings.forge = true;
+                    setings.mLogs = false;
                     File.WriteAllText(gPath + "\\seting.json", jss.Serialize(setings));
                 }
                 else
@@ -270,13 +265,31 @@ namespace WindowsFormsApplication1
                     }
                 }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Ошибка при попытке обновления"); }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Произошла ошибка, пожалуйста, отправте файл логов \"...\\Roaming\\SyabroCraft\\LauncherLog.log\" на форум разработчика.");
+                writeToLog("[" + DateTime.Today + "]: Произошал ошибка: ");
+                writeToLog("Сообщение: " + ex.Message);
+                writeToLog("Исключение из: " + ex.TargetSite);
+                writeToLog("Информация: " + ex.Data);
+                writeToLog("Стек: " + ex.StackTrace);
+                Process.Start("http://syabrocraft.xyz/forums/forum/%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81-%D0%BE%D1%82%D0%B2%D0%B5%D1%82/");
+                Process.Start(gPath);
+                logFile.Close();
+                Close();
+            }
         }
 
         private void backgroundWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
             Process.Start(gPath + "\\Launcher.exe");
-            this.Close();
+            logFile.Close();
+            Close();
+        }
+
+        private void writeToLog(string text)
+        {
+            logFile.WriteLine(text);
         }
 
         private static string POST(string Url, string Data)
@@ -305,6 +318,7 @@ namespace WindowsFormsApplication1
             }
             return Out;
         }
+
         private string ComputeMD5Checksum(string path)
         {
             using (FileStream fs = File.OpenRead(path))
@@ -344,5 +358,7 @@ namespace WindowsFormsApplication1
         public int launcher_version;
         public int core_version;
         public int updater_version;
+        public bool lLogs;
+        public bool mLogs;
     }
 }

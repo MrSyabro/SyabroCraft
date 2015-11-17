@@ -1,4 +1,5 @@
 ﻿using Launcher;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
@@ -68,11 +69,20 @@ namespace System
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Ошибка в запуске Minecraft");
+                MessageBox.Show("Произошла ошибка, пожалуйста, отправте файл логов \"...\\Roaming\\SyabroCraft\\LauncherLog.log\" на форум разработчика.");
+                AuthWindow.writeToLog("[" + DateTime.Today + "]: Произошал ошибка: ");
+                AuthWindow.writeToLog("Сообщение: " + ex.Message);
+                AuthWindow.writeToLog("Исключение из: " + ex.TargetSite);
+                AuthWindow.writeToLog("Информация: " + ex.Data);
+                AuthWindow.writeToLog("Стек: " + ex.StackTrace);
+                Process.Start(SetingClass.pDir + "\\" + SetingClass.gDir);
+                Process.Start("http://syabrocraft.xyz/forums/forum/%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81-%D0%BE%D1%82%D0%B2%D0%B5%D1%82/");
+                AuthWindow.logFile.Close();
+                Close();
             }
             //label2.Text = "Читаю логи.. :)";
-            //File.WriteAllText(SetingClass.pDir + "\\" + SetingClass.gDir + "\\LogFile.log", proc.StandardOutput.ReadToEnd());
-            //File.WriteAllText(SetingClass.pDir + "\\" + SetingClass.gDir + "\\LogFile2.log", proc.StandardError.ReadToEnd());
+            //AuthWindow.writeToLog(proc.StandardError.ReadToEnd());
+            //AuthWindow.writeToLog(proc.StandardOutput.ReadToEnd());
         }
 
         private void backgroundWorker1_DoWork_downloadBuild(object sender, ComponentModel.DoWorkEventArgs e)
@@ -100,9 +110,19 @@ namespace System
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Ошибка при загрузке сборки");
+                MessageBox.Show("Произошла ошибка", "Произошла ошибка, пожалуйста, отправте файл логов \"...\\Roaming\\SyabroCraft\\LauncherLog.log\" на форум разработчика.");
+                AuthWindow.writeToLog("[" + DateTime.Today + "]: Произошал ошибка: ");
+                AuthWindow.writeToLog("Сообщение: " + ex.Message);
+                AuthWindow.writeToLog("Исключение из: " + ex.TargetSite);
+                AuthWindow.writeToLog("Информация: " + ex.Data);
+                AuthWindow.writeToLog("Стек: " + ex.StackTrace);
+                Process.Start(SetingClass.pDir + "\\" + SetingClass.gDir);
+                Process.Start("http://syabrocraft.xyz/forums/forum/%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81-%D0%BE%D1%82%D0%B2%D0%B5%D1%82/");
+                AuthWindow.logFile.Close();
+                Close();
             }
         }
+
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -112,6 +132,7 @@ namespace System
                 this.Location = location;
             }
         }
+
         private string ComputeMD5Checksum(string path)
         {
             using (FileStream fs = File.OpenRead(path))
@@ -189,6 +210,11 @@ namespace System
         private void DownloadBuild_ProgressChanged(object sender, ComponentModel.ProgressChangedEventArgs e)
         {
             label2.Text = e.UserState as String;
+        }
+
+        private void proc_ErrorDataReceived(object sender, Diagnostics.DataReceivedEventArgs e)
+        {
+            AuthWindow.writeToLog(sender as string);
         }
     }
     class BuildInfo

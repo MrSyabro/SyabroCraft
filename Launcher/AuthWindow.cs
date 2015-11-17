@@ -7,20 +7,18 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using System.Web.Script.Serialization;
-using System.Xml.Serialization;
 
 namespace Launcher
 {
     public partial class AuthWindow : Form
     {
-        INI ini = new INI();
         JavaScriptSerializer jss = new JavaScriptSerializer();
         MainWindow mainWindow = new MainWindow();
+        public static StreamWriter logFile = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SyabroCraft\\LauncherLog.log", true);
 
         public AuthWindow()
         {
             InitializeComponent();
-            ini.path = SetingClass.pDir + "\\" + SetingClass.gDir + "\\seting.ini";
         }
 
         private void authBotton_Click(object sender, EventArgs e)
@@ -43,7 +41,6 @@ namespace Launcher
                     loginInfo.username = loginbox.Text;
                     loginInfo.password = passbox.Text;
                     loginInfo.clientToken = SetingClass.clientToken;
-                    //"application/json"
                     string responseFromServer = POST(SetingClass.authLink + "authenticate.php", jss.Serialize(loginInfo), @"application/json");
                     if (responseFromServer == "Bad login")
                     {
@@ -68,13 +65,21 @@ namespace Launcher
                         Close();
                     }
                 }
-                catch (Exception ex) { MessageBox.Show(ex.Message, "Ошибка при попытке авторизироваться"); this.DialogResult = DialogResult.OK; }
+                catch (Exception ex) {
+                    MessageBox.Show("Произошла ошибка", "Произошла ошибка, пожалуйста, отправте файл логов \"...\\Roaming\\SyabroCraft\\LauncherLog.log\" на форум разработчика.");
+                    writeToLog("[" + DateTime.Today + "]: Произошал ошибка: ");
+                    writeToLog("Сообщение: " + ex.Message);
+                    writeToLog("Исключение из: " + ex.TargetSite);
+                    writeToLog("Информация: " + ex.Data);
+                    writeToLog("Стек: " + ex.StackTrace);
+                    Process.Start(SetingClass.pDir + "\\" + SetingClass.gDir);
+                    this.DialogResult = DialogResult.OK; }
             }
         }
 
         private void regBotton_Click(object sender, EventArgs e)
         {
-            Process.Start("http://syabrocraft.esy.es/register/");
+            Process.Start("http://syabrocraft.xyz/register/");
         }
 
         private void loginbox_MouseClick(object sender, MouseEventArgs e)
@@ -105,63 +110,78 @@ namespace Launcher
                 passbox.Text = "Password";
             }
         }
+
         private void AuthWindow_Show(object sender, EventArgs e)
         {
-            progressBar1.Hide();
-            if (File.Exists(SetingClass.pDir + "\\" + SetingClass.gDir + "\\seting.json"))
-            {
-                SerSetingsClass serSetings = jss.Deserialize<SerSetingsClass>(File.ReadAllText(SetingClass.pDir + "\\" + SetingClass.gDir + "\\seting.json"));
-                SetingClass.accessToken = serSetings.accessToken;
-                SetingClass.clientToken = serSetings.clientToken;
-                SetingClass.dopArguments = serSetings.dopArguments;
-                SetingClass.forge = serSetings.forge;
-                SetingClass.javaPath = serSetings.javaPath;
-                SetingClass.oldBuild = serSetings.oldBuild;
-                SetingClass.oldServer = serSetings.oldServer;
-                SetingClass.shaders = serSetings.shaders;
-                SetingClass.sram = serSetings.sram;
-            }
-            if (SetingClass.accessToken != "")
-            {
-                loginbox.Enabled = false;
-                passbox.Enabled = false;
-                authBotton.Enabled = false;
-                regBotton.Enabled = false;
-                progressBar1.Show();
-                Refresh validateData = new Refresh();
-                validateData.clientToken = SetingClass.clientToken;
-                validateData.accessToken = SetingClass.accessToken;
-
-                string validateSerData = jss.Serialize(validateData);
-                string responseValidServer = POST(SetingClass.authLink + "refresh.php", validateSerData, "application/json");
-                ResponeServer responseValidServerObj = jss.Deserialize<ResponeServer>(responseValidServer);
-                if (responseValidServerObj.error != null)
+            try {
+                progressBar1.Hide();
+                if (File.Exists(SetingClass.pDir + "\\" + SetingClass.gDir + "\\seting.json"))
                 {
-                    MessageBox.Show(responseValidServerObj.errorMessage, responseValidServerObj.error);
-                    loginbox.Enabled = true;
-                    passbox.Enabled = true;
-                    authBotton.Enabled = true;
-                    regBotton.Enabled = true;
-                    progressBar1.Hide();
-                    passbox.PasswordChar = '*';
-                } else
-                {
-                    SetingClass.clientToken = responseValidServerObj.clientToken;
-                    SetingClass.accessToken = responseValidServerObj.accessToken;
-                    SetingClass.login = responseValidServerObj.selectedProfile.name;
-                    SetingClass.uuid = responseValidServerObj.selectedProfile.id;
-                    saveSetings();
-                    Hide();
-                    mainWindow.ShowDialog();
-                    Close();
+                    SerSetingsClass serSetings = jss.Deserialize<SerSetingsClass>(File.ReadAllText(SetingClass.pDir + "\\" + SetingClass.gDir + "\\seting.json"));
+                    SetingClass.accessToken = serSetings.accessToken;
+                    SetingClass.clientToken = serSetings.clientToken;
+                    SetingClass.dopArguments = serSetings.dopArguments;
+                    SetingClass.forge = serSetings.forge;
+                    SetingClass.javaPath = serSetings.javaPath;
+                    SetingClass.oldBuild = serSetings.oldBuild;
+                    SetingClass.oldServer = serSetings.oldServer;
+                    SetingClass.shaders = serSetings.shaders;
+                    SetingClass.sram = serSetings.sram;
                 }
-                
-            }
-            else
-            {
-                passbox.PasswordChar = '*';
+                if (SetingClass.accessToken != "")
+                {
+                    loginbox.Enabled = false;
+                    passbox.Enabled = false;
+                    authBotton.Enabled = false;
+                    regBotton.Enabled = false;
+                    progressBar1.Show();
+                    Refresh validateData = new Refresh();
+                    validateData.clientToken = SetingClass.clientToken;
+                    validateData.accessToken = SetingClass.accessToken;
+
+                    string validateSerData = jss.Serialize(validateData);
+                    string responseValidServer = POST(SetingClass.authLink + "refresh.php", validateSerData, "application/json");
+                    ResponeServer responseValidServerObj = jss.Deserialize<ResponeServer>(responseValidServer);
+                    if (responseValidServerObj.error != null)
+                    {
+                        MessageBox.Show(responseValidServerObj.errorMessage, responseValidServerObj.error);
+                        loginbox.Enabled = true;
+                        passbox.Enabled = true;
+                        authBotton.Enabled = true;
+                        regBotton.Enabled = true;
+                        progressBar1.Hide();
+                        passbox.PasswordChar = '*';
+                    } else
+                    {
+                        SetingClass.clientToken = responseValidServerObj.clientToken;
+                        SetingClass.accessToken = responseValidServerObj.accessToken;
+                        SetingClass.login = responseValidServerObj.selectedProfile.name;
+                        SetingClass.uuid = responseValidServerObj.selectedProfile.id;
+                        saveSetings();
+                        Hide();
+                        mainWindow.ShowDialog();
+                        Close();
+                    }
+
+                }
+                else
+                {
+                    passbox.PasswordChar = '*';
+                }
+            } catch (Exception ex) {
+                MessageBox.Show("Произошла ошибка, пожалуйста, отправте файл логов \"...\\Roaming\\SyabroCraft\\LauncherLog.log\" на форум разработчика.");
+                writeToLog("[" + DateTime.Today + "]: Произошал ошибка: ");
+                writeToLog("Сообщение: " + ex.Message);
+                writeToLog("Исключение из: " + ex.TargetSite);
+                writeToLog("Информация: " + ex.Data);
+                writeToLog("Стек: " + ex.StackTrace);
+                Process.Start(SetingClass.pDir + "\\" + SetingClass.gDir);
+                Process.Start("http://syabrocraft.xyz/forums/forum/%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81-%D0%BE%D1%82%D0%B2%D0%B5%D1%82/");
+                AuthWindow.logFile.Close();
+                Close();
             }
         }
+
         public static string POST(string Url, string Data, string ContentType = "application/x-www-form-urlencoded")
         {
             WebRequest req = WebRequest.Create(Url);
@@ -176,7 +196,6 @@ namespace Launcher
             WebResponse res = req.GetResponse();
             Stream ReceiveStream = res.GetResponseStream();
             StreamReader sr = new StreamReader(ReceiveStream, Encoding.UTF8);
-            //Кодировка указывается в зависимости от кодировки ответа сервера
             Char[] read = new Char[256];
             int count = sr.Read(read, 0, 256);
             string Out = String.Empty;
@@ -188,6 +207,7 @@ namespace Launcher
             }
             return Out;
         }
+
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -197,10 +217,12 @@ namespace Launcher
                 this.Location = location;
             }
         }
+
         private void button1_Click(object sender, EventArgs e)
         {
             this.Close();
         }
+
         public static void saveSetings()
         {
             SerSetingsClass serSetings = new SerSetingsClass();
@@ -216,35 +238,13 @@ namespace Launcher
             serSetings.sram = SetingClass.sram;
             File.WriteAllText(SetingClass.pDir + "\\" + SetingClass.gDir + "\\seting.json", jss.Serialize(serSetings));
         }
+
+        public static void writeToLog(string text)
+        {
+            logFile.WriteLine(text);
+        }
     }
 
-    public class INI
-    {
-        public string path;
-
-        [DllImport("kernel32")]
-        private static extern long WritePrivateProfileString(string section, string key, string val, string filePath);
-        [DllImport("kernel32")]
-        private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
-
-        public void IniWriteValue(string Section, string Key, string Value)
-        {
-            if (!Directory.Exists(Path.GetDirectoryName(path)))
-                Directory.CreateDirectory(Path.GetDirectoryName(path));
-            if (!File.Exists(path))
-                using (File.Create(path)) { };
-
-            WritePrivateProfileString(Section, Key, Value, this.path);
-        }
-
-        public string IniReadValue(string Section, string Key)
-        {
-            StringBuilder temp = new StringBuilder(255);
-            int i = GetPrivateProfileString(Section, Key, "", temp, 255, this.path);
-            return temp.ToString();
-        }
-
-    }
     public static class SetingClass
     {
         public static string sram = "1G";
