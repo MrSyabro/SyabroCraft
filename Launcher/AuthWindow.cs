@@ -124,6 +124,7 @@ namespace Launcher
                     SetingClass.forge = serSetings.forge;
                     SetingClass.shaders = serSetings.shaders;
                     SetingClass.buildAutoSync = serSetings.buildAutoSync;
+                    SetingClass.showConsole = serSetings.showConsole;
                     SetingClass.liteMod = serSetings.liteMod;
                     SetingClass.javaPath = serSetings.javaPath;
                     SetingClass.oldBuild = serSetings.oldBuild;
