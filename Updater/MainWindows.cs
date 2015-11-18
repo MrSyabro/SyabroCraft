@@ -21,7 +21,6 @@ namespace WindowsFormsApplication1
         public string repoLinc = @"http://syabrocraft.xyz/wp-content/minecraft/";
         public string versLinc = @"http://syabrocraft.xyz/wp-content/plugins/syabrocraft/version_change.php";
         public Uri libLinc;
-        //FileStream logFile = File.OpenWrite(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SyabroCraft\\LauncherLog.log");
         StreamWriter logFile = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SyabroCraft\\LauncherLog.log", true);
 
         public Form1()
@@ -34,13 +33,11 @@ namespace WindowsFormsApplication1
             if (!Directory.Exists(gPath))
             {
                 label2.Text = "Загрузка файлов...";
-                writeToLog("[" + DateTime.Today + "]: Запуск фоновой загрузки файлов.");
                 backgroundWorker1.RunWorkerAsync();
             }
             else
             {
                 label2.Text = "Проверка...";
-                writeToLog("[" + DateTime.Today + "]: Запуск фоновой проверки файлов и обновлений.");
                 backgroundWorker2.RunWorkerAsync();
             }
         }
@@ -94,13 +91,8 @@ namespace WindowsFormsApplication1
                 File.Delete(gPath + "\\mCore.zip");
                 File.Delete(gPath + "\\lCore.zip");
 
-                string launcherver = POST(versLinc, "name=launcher");
-                string corever = POST(versLinc, "name=core");
-
                 SerSetingsClass setings = new SerSetingsClass();
                 setings.sram = "1G";
-                setings.core_version = Convert.ToInt32( corever );
-                setings.launcher_version = Convert.ToInt32(launcherver);
                 setings.dopArguments = "";
                 setings.oldBuild = "";
                 setings.oldServer = "";
@@ -152,8 +144,8 @@ namespace WindowsFormsApplication1
                 {
                     HttpWebRequest libsListWebRequest = (HttpWebRequest)WebRequest.Create(libLinc);
                     HttpWebResponse libsListWebResponse = (HttpWebResponse)libsListWebRequest.GetResponse();
-                    Stream ReceiveStream = libsListWebResponse.GetResponseStream();
-                    StreamReader libListSR = new StreamReader(ReceiveStream, Encoding.UTF8);
+                    Stream libsListReceiveStream = libsListWebResponse.GetResponseStream();
+                    StreamReader libListSR = new StreamReader(libsListReceiveStream, Encoding.UTF8);
                     string libListJSON = libListSR.ReadToEnd();
                     List<Lib> libList = jss.Deserialize<List<Lib>>(libListJSON);
                     foreach (Lib lib in libList)
@@ -166,8 +158,8 @@ namespace WindowsFormsApplication1
                 {
                     HttpWebRequest libsListWebRequest = (HttpWebRequest)WebRequest.Create(libLinc);
                     HttpWebResponse libsListWebResponse = (HttpWebResponse)libsListWebRequest.GetResponse();
-                    Stream ReceiveStream = libsListWebResponse.GetResponseStream();
-                    StreamReader libListSR = new StreamReader(ReceiveStream, Encoding.UTF8);
+                    Stream libsListReceiveStream = libsListWebResponse.GetResponseStream();
+                    StreamReader libListSR = new StreamReader(libsListReceiveStream, Encoding.UTF8);
                     string libListJSON = libListSR.ReadToEnd();
                     List<Lib> libList = jss.Deserialize<List<Lib>>(libListJSON);
                     foreach (Lib lib in libList)
@@ -192,8 +184,8 @@ namespace WindowsFormsApplication1
                     backgroundWorker1.ReportProgress(0, "Загрузка ресурсов...");
                     HttpWebRequest assetsListWebRequest = (HttpWebRequest)WebRequest.Create(repoLinc + "/assets.json");
                     HttpWebResponse assetsListWebResponse = (HttpWebResponse)assetsListWebRequest.GetResponse();
-                    Stream ReceiveStream = assetsListWebResponse.GetResponseStream();
-                    StreamReader assetListSR = new StreamReader(ReceiveStream, Encoding.UTF8);
+                    Stream assetsListReceiveStream = assetsListWebResponse.GetResponseStream();
+                    StreamReader assetListSR = new StreamReader(assetsListReceiveStream, Encoding.UTF8);
                     string assetListJSON = assetListSR.ReadToEnd();
                     List<string> assetList = jss.Deserialize<List<string>>(assetListJSON);
                     foreach (string asset in assetList)
@@ -221,15 +213,16 @@ namespace WindowsFormsApplication1
                     File.Delete(gPath + "\\lCore.zip");
                 }
 
-                int siteLauncherVer = Convert.ToInt32(POST(versLinc, "name=launcher"));
-                int siteCoreVer = Convert.ToInt32(POST(versLinc, "name=core"));
+                HttpWebRequest launcherHashWebRequest = (HttpWebRequest)WebRequest.Create(repoLinc + "/launcher.md5");
+                HttpWebResponse launcherHashWebResponse = (HttpWebResponse)launcherHashWebRequest.GetResponse();
+                Stream ReceiveStream = launcherHashWebResponse.GetResponseStream();
+                StreamReader launcherHashSR = new StreamReader(ReceiveStream, Encoding.UTF8);
+                string launcherHash = launcherHashSR.ReadToEnd();
 
                 if (!File.Exists(gPath + "\\seting.json"))
                 {
                     SerSetingsClass setings = new SerSetingsClass();
                     setings.sram = "1G";
-                    setings.core_version = Convert.ToInt32(siteCoreVer);
-                    setings.launcher_version = Convert.ToInt32(siteLauncherVer);
                     setings.dopArguments = "";
                     setings.oldBuild = "";
                     setings.oldServer = "";
@@ -242,26 +235,13 @@ namespace WindowsFormsApplication1
                 }
                 else
                 {
-                    SerSetingsClass setings = jss.Deserialize<SerSetingsClass>(File.ReadAllText(gPath + "\\seting.json"));
-                    if (siteLauncherVer < setings.launcher_version)
+                    if (ComputeMD5Checksum(gPath + "\\Launcher.exe") != launcherHash)
                     {
                         backgroundWorker2.ReportProgress(0, "Обновление лаунчера...");
                         File.Delete(gPath + "\\Launcher.exe");
                         client.DownloadFile(new Uri(repoLinc + "/lCore.zip"), gPath + "\\lCore.zip");
                         ZipFile.ExtractToDirectory(gPath + "\\lCore.zip", gPath);
                         File.Delete(gPath + "\\lCore.zip");
-                        setings.launcher_version = siteLauncherVer;
-                        File.WriteAllText(gPath + "\\seting.json", jss.Serialize(setings));
-                    }
-                    if (siteCoreVer < setings.core_version)
-                    {
-                        backgroundWorker2.ReportProgress(0, "Обновления Minecraft...");
-                        Directory.Delete(gPath + "\\bin", true);
-                        client.DownloadFile(new Uri(repoLinc + "/mCore.zip"), gPath + "\\mCore.zip");
-                        ZipFile.ExtractToDirectory(gPath + "\\mCore.zip", gPath);
-                        File.Delete(gPath + "\\mCore.zip");
-                        setings.launcher_version = siteCoreVer;
-                        File.WriteAllText(gPath + "\\seting.json", jss.Serialize(setings));
                     }
                 }
             }
@@ -355,8 +335,6 @@ namespace WindowsFormsApplication1
         public string oldServer;
         public bool forge;
         public bool shaders;
-        public int launcher_version;
-        public int core_version;
         public int updater_version;
         public bool lLogs;
         public bool mLogs;
