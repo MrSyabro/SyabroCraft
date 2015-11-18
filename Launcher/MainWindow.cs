@@ -44,6 +44,12 @@ namespace Launcher
         }
         private void Form1_Load(object sender, EventArgs e)
         {
+            if (!SetingClass.buildAutoSync)
+                if (MessageBox.Show("Синхронизация сборок отключена!", "Предупреждение", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    SetingClass.buildAutoSync = true;
+                    saveSetings();
+                }
             try
             {
                 HttpWebRequest buildsListWebRequest = (HttpWebRequest)WebRequest.Create(SetingClass.repoLink + "builds.json");
@@ -136,7 +142,6 @@ namespace Launcher
 
         private void buildsSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //Build build = SearchBuild(buildsSelector.SelectedText);
             foreach (Server server in buildsList.builds[buildsSelector.SelectedIndex].servers)
             {
                 serverSelector.Items.Add(server.Name);
@@ -151,11 +156,14 @@ namespace Launcher
             serSetings.clientToken = SetingClass.clientToken;
             serSetings.dopArguments = SetingClass.dopArguments;
             serSetings.forge = SetingClass.forge;
+            serSetings.liteMod = SetingClass.liteMod;
+            serSetings.buildAutoSync = SetingClass.buildAutoSync;
             serSetings.javaPath = SetingClass.javaPath;
             serSetings.oldBuild = SetingClass.oldBuild;
             serSetings.oldServer = SetingClass.oldServer;
             serSetings.shaders = SetingClass.shaders;
             serSetings.sram = SetingClass.sram;
+            serSetings.showConsole = SetingClass.showConsole;
             File.WriteAllText(SetingClass.pDir + "\\" + SetingClass.gDir + "\\seting.json", jss.Serialize(serSetings));
         }
     }

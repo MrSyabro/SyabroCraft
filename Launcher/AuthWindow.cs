@@ -122,11 +122,14 @@ namespace Launcher
                     SetingClass.clientToken = serSetings.clientToken;
                     SetingClass.dopArguments = serSetings.dopArguments;
                     SetingClass.forge = serSetings.forge;
+                    SetingClass.shaders = serSetings.shaders;
+                    SetingClass.buildAutoSync = serSetings.buildAutoSync;
+                    SetingClass.liteMod = serSetings.liteMod;
                     SetingClass.javaPath = serSetings.javaPath;
                     SetingClass.oldBuild = serSetings.oldBuild;
                     SetingClass.oldServer = serSetings.oldServer;
-                    SetingClass.shaders = serSetings.shaders;
                     SetingClass.sram = serSetings.sram;
+                    
                 }
                 if (SetingClass.accessToken != "")
                 {
@@ -231,11 +234,14 @@ namespace Launcher
             serSetings.clientToken = SetingClass.clientToken;
             serSetings.dopArguments = SetingClass.dopArguments;
             serSetings.forge = SetingClass.forge;
+            serSetings.liteMod = SetingClass.liteMod;
+            serSetings.buildAutoSync = SetingClass.buildAutoSync;
             serSetings.javaPath = SetingClass.javaPath;
             serSetings.oldBuild = SetingClass.oldBuild;
             serSetings.oldServer = SetingClass.oldServer;
             serSetings.shaders = SetingClass.shaders;
             serSetings.sram = SetingClass.sram;
+            serSetings.showConsole = SetingClass.showConsole;
             File.WriteAllText(SetingClass.pDir + "\\" + SetingClass.gDir + "\\seting.json", jss.Serialize(serSetings));
         }
 
@@ -254,16 +260,20 @@ namespace Launcher
         public static string accessToken;
         public static string login;
         public static string uuid;
-        public static Build selectedBuild;
-        public static Server selectedServer;
+        public static string oldBuild;
+        public static string oldServer;
         public static string pDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         public static string gDir = "SyabroCraft";
+        public static Build selectedBuild;
+        public static Server selectedServer;
         public static Uri repoLink = new Uri("http://syabrocraft.xyz/wp-content/minecraft/");
         public static Uri authLink = new Uri("http://syabrocraft.xyz/wp-content/plugins/syabrocraft/");
         public static bool forge = true;
-        public static string oldBuild;
-        public static string oldServer;
+        public static bool liteMod = true;
         public static bool shaders = false;
+        public static bool showConsole = false;
+        public static bool buildAutoSync;
+        
     }
     [Serializable]
     class SerSetingsClass
@@ -277,6 +287,9 @@ namespace Launcher
         public string oldServer;
         public bool forge;
         public bool shaders;
+        public bool liteMod;
+        public bool buildAutoSync;
+        public bool showConsole;
     }
     [Serializable]
     public class ResponeServer

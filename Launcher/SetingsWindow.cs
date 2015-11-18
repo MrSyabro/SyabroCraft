@@ -32,7 +32,10 @@ namespace setings
             SetingClass.sram = ram;
             SetingClass.javaPath = textBox2.Text;
             SetingClass.forge = checkBoxForge.Checked;
+            SetingClass.liteMod = checkBoxLiteMod.Checked;
+            SetingClass.buildAutoSync = checkBoxBuildSync.Checked;
             SetingClass.shaders = checkBoxShaders.Checked;
+            SetingClass.showConsole = checkBoxConsole.Checked;
             this.DialogResult = DialogResult.OK;
         }
 
@@ -43,6 +46,9 @@ namespace setings
             textBox1.Text = SetingClass.dopArguments;
             checkBoxForge.Checked = SetingClass.forge;
             checkBoxShaders.Checked = SetingClass.shaders;
+            checkBoxLiteMod.Checked = SetingClass.liteMod;
+            checkBoxBuildSync.Checked = SetingClass.buildAutoSync;
+            checkBoxConsole.Checked = SetingClass.showConsole;
 
         }
 

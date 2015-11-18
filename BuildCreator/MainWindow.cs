@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Security.Cryptography;
+using System.Text;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
 
@@ -29,11 +31,15 @@ namespace BuildCreator
 
         private void buildsSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
-            fileListSelect.Items.Clear();
+            buildFileList.Items.Clear();
             
-            foreach(string itemName in Directory.GetFiles(gamePath + "builds\\" + buildsSelector.Text, "*.*", SearchOption.AllDirectories))
+            foreach(string itemName in Directory.GetFiles(gamePath + "builds\\" + buildsSelector.Text + "\\mods\\", "*.jar", SearchOption.AllDirectories))
             {
-                fileListSelect.Items.Add(itemName);
+                buildFileList.Items.Add(itemName);
+            }
+            foreach (string itemName in Directory.GetFiles(gamePath + "builds\\" + buildsSelector.Text + "\\mods\\", "*.litemod", SearchOption.AllDirectories))
+            {
+                buildFileList.Items.Add(itemName);
             }
         }
 
@@ -41,7 +47,7 @@ namespace BuildCreator
         {
             BuildInfo buildInfo = new BuildInfo();
             buildInfo.id = buildsSelector.Text;
-            foreach (string item in fileListSelect.CheckedItems)
+            foreach (string item in buildFileList.Items)
             {
                 Item itemInList = new Item();
                 itemInList.name = new FileInfo(item).Name;
@@ -51,8 +57,7 @@ namespace BuildCreator
                 buildInfo.fileList.Add(itemInList);
             }
             string outPut = jss.Serialize(buildInfo);
-            MessageBox.Show(outPut);
-            File.WriteAllText(gamePath + "\\builds\\" + buildsSelector.Text + ".json", outPut);
+            MessageBox.Show(POST("http://syabrocraft.xyz/wp-content/plugins/syabrocraft/build_editor.php", "key=" + keyTextBox.Text + "&json=" + outPut));
         }
 
         private string ComputeMD5Checksum(string path)
@@ -66,19 +71,6 @@ namespace BuildCreator
                 string result = BitConverter.ToString(checkSum).Replace("-", String.Empty);
                 return result;
             }
-        }
-
-        private void CBButton_Click(object sender, EventArgs e)
-        {
-            string item = fileListSelect.SelectedItem as string;
-            Item itemInfo = new Item();
-            itemInfo.name = new FileInfo(item).Name;
-            itemInfo.hash = ComputeMD5Checksum(item);
-            itemInfo.localPath = item.Replace(gamePath + "builds\\" + buildsSelector.Text, "").Replace(@"\", "\\");
-            itemInfo.sitePath = item.Replace(gamePath + "builds\\" + buildsSelector.Text, "").Replace("\\", "/");
-            string outPut = jss.Serialize(itemInfo);
-            MessageBox.Show(outPut);
-            File.WriteAllText(gamePath + "\\builds\\" + buildsSelector.Text + "_" + new FileInfo(item).Name + ".json", outPut);
         }
 
         private void allLibsList_Click(object sender, EventArgs e)
@@ -110,6 +102,31 @@ namespace BuildCreator
             }
             File.WriteAllText(gamePath + "\\assets.json", jss.Serialize(assetsList));
             MessageBox.Show("OK");
+        }
+        public static string POST(string Url, string Data, string ContentType = "application/x-www-form-urlencoded")
+        {
+            WebRequest req = WebRequest.Create(Url);
+            req.Method = "POST";
+            req.Timeout = 100000;
+            req.ContentType = ContentType;
+            byte[] sentData = Encoding.GetEncoding(1251).GetBytes(Data);
+            req.ContentLength = sentData.Length;
+            Stream sendStream = req.GetRequestStream();
+            sendStream.Write(sentData, 0, sentData.Length);
+            sendStream.Close();
+            WebResponse res = req.GetResponse();
+            Stream ReceiveStream = res.GetResponseStream();
+            StreamReader sr = new StreamReader(ReceiveStream, Encoding.UTF8);
+            Char[] read = new Char[256];
+            int count = sr.Read(read, 0, 256);
+            string Out = String.Empty;
+            while (count > 0)
+            {
+                String str = new String(read, 0, count);
+                Out += str;
+                count = sr.Read(read, 0, 256);
+            }
+            return Out;
         }
     }
 

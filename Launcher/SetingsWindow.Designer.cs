@@ -43,6 +43,9 @@
             this.checkBoxForge = new System.Windows.Forms.CheckBox();
             this.openJavaFile = new System.Windows.Forms.OpenFileDialog();
             this.checkBoxShaders = new System.Windows.Forms.CheckBox();
+            this.checkBoxLiteMod = new System.Windows.Forms.CheckBox();
+            this.checkBoxBuildSync = new System.Windows.Forms.CheckBox();
+            this.checkBoxConsole = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -54,9 +57,9 @@
             this.label1.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.label1.Location = new System.Drawing.Point(31, 3);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(180, 19);
+            this.label1.Size = new System.Drawing.Size(198, 19);
             this.label1.TabIndex = 2;
-            this.label1.Text = "SyabroCraft Setings";
+            this.label1.Text = "SyabroCraft Настройки";
             // 
             // button2
             // 
@@ -64,7 +67,7 @@
             this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button2.Font = new System.Drawing.Font("Consolas", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.button2.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.button2.Location = new System.Drawing.Point(236, 233);
+            this.button2.Location = new System.Drawing.Point(237, 323);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(92, 28);
             this.button2.TabIndex = 3;
@@ -78,7 +81,7 @@
             this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button3.Font = new System.Drawing.Font("Consolas", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.button3.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.button3.Location = new System.Drawing.Point(334, 233);
+            this.button3.Location = new System.Drawing.Point(334, 323);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 28);
             this.button3.TabIndex = 4;
@@ -203,7 +206,7 @@
             this.checkBoxForge.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.checkBoxForge.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Bold);
             this.checkBoxForge.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(150)))), ((int)(((byte)(150)))));
-            this.checkBoxForge.Location = new System.Drawing.Point(12, 158);
+            this.checkBoxForge.Location = new System.Drawing.Point(12, 187);
             this.checkBoxForge.Name = "checkBoxForge";
             this.checkBoxForge.Size = new System.Drawing.Size(178, 23);
             this.checkBoxForge.TabIndex = 18;
@@ -220,19 +223,61 @@
             this.checkBoxShaders.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.checkBoxShaders.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Bold);
             this.checkBoxShaders.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(150)))), ((int)(((byte)(150)))));
-            this.checkBoxShaders.Location = new System.Drawing.Point(12, 187);
+            this.checkBoxShaders.Location = new System.Drawing.Point(12, 216);
             this.checkBoxShaders.Name = "checkBoxShaders";
             this.checkBoxShaders.Size = new System.Drawing.Size(214, 23);
             this.checkBoxShaders.TabIndex = 19;
             this.checkBoxShaders.Text = "Запустить с шейдерами";
             this.checkBoxShaders.UseVisualStyleBackColor = true;
             // 
+            // checkBoxLiteMod
+            // 
+            this.checkBoxLiteMod.AutoSize = true;
+            this.checkBoxLiteMod.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.checkBoxLiteMod.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Bold);
+            this.checkBoxLiteMod.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(150)))), ((int)(((byte)(150)))));
+            this.checkBoxLiteMod.Location = new System.Drawing.Point(12, 158);
+            this.checkBoxLiteMod.Name = "checkBoxLiteMod";
+            this.checkBoxLiteMod.Size = new System.Drawing.Size(196, 23);
+            this.checkBoxLiteMod.TabIndex = 20;
+            this.checkBoxLiteMod.Text = "Запустить с LiteMod";
+            this.checkBoxLiteMod.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxBuildSync
+            // 
+            this.checkBoxBuildSync.AutoSize = true;
+            this.checkBoxBuildSync.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.checkBoxBuildSync.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Bold);
+            this.checkBoxBuildSync.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(150)))), ((int)(((byte)(150)))));
+            this.checkBoxBuildSync.Location = new System.Drawing.Point(12, 245);
+            this.checkBoxBuildSync.Name = "checkBoxBuildSync";
+            this.checkBoxBuildSync.Size = new System.Drawing.Size(250, 23);
+            this.checkBoxBuildSync.TabIndex = 21;
+            this.checkBoxBuildSync.Text = "Авто синхронизация сборок";
+            this.checkBoxBuildSync.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxConsole
+            // 
+            this.checkBoxConsole.AutoSize = true;
+            this.checkBoxConsole.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.checkBoxConsole.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Bold);
+            this.checkBoxConsole.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(150)))), ((int)(((byte)(150)))));
+            this.checkBoxConsole.Location = new System.Drawing.Point(12, 274);
+            this.checkBoxConsole.Name = "checkBoxConsole";
+            this.checkBoxConsole.Size = new System.Drawing.Size(259, 23);
+            this.checkBoxConsole.TabIndex = 22;
+            this.checkBoxConsole.Text = "Выводить консоль Minecraft";
+            this.checkBoxConsole.UseVisualStyleBackColor = true;
+            // 
             // Setings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(234)))), ((int)(((byte)(245)))));
-            this.ClientSize = new System.Drawing.Size(421, 273);
+            this.ClientSize = new System.Drawing.Size(421, 363);
+            this.Controls.Add(this.checkBoxConsole);
+            this.Controls.Add(this.checkBoxBuildSync);
+            this.Controls.Add(this.checkBoxLiteMod);
             this.Controls.Add(this.checkBoxShaders);
             this.Controls.Add(this.checkBoxForge);
             this.Controls.Add(this.label4);
@@ -274,5 +319,8 @@
         private System.Windows.Forms.OpenFileDialog openJavaFile;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.CheckBox checkBoxShaders;
+        private System.Windows.Forms.CheckBox checkBoxLiteMod;
+        private System.Windows.Forms.CheckBox checkBoxBuildSync;
+        private System.Windows.Forms.CheckBox checkBoxConsole;
     }
 }

@@ -20,6 +20,7 @@ namespace System
         public string forge = "";
         public string server = "";
         public string shaders = "";
+        public string liteMod = "";
         WebClient client = new WebClient();
         JavaScriptSerializer jss = new JavaScriptSerializer();
 
@@ -28,7 +29,13 @@ namespace System
             if (Directory.Exists(SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID))
             {
                 label2.Text = "Проверка целосности сборки";
-                CheckBuild.RunWorkerAsync();
+                if (SetingClass.buildAutoSync)
+                {
+                    CheckBuild.RunWorkerAsync();
+                } else
+                {
+                    startGame();
+                }
             } else {
                 label2.Text = "Загрузка сборки...";
                 DownloadBuild.RunWorkerAsync();
@@ -57,13 +64,19 @@ namespace System
                 if (SetingClass.shaders)
                     shaders = " --tweakClass shadersmodcore.loading.SMCTweaker";
 
+                if (SetingClass.liteMod)
+                    shaders = " --tweakClass com.mumfrey.liteloader.launch.LiteLoaderTweaker";
+
                 string MineLib = string.Join("\";\"", Directory.GetFiles(SetingClass.pDir + "\\" + SetingClass.gDir + "\\libraries", "*.jar", SearchOption.AllDirectories));
-                proc.StartInfo.Arguments = SetingClass.dopArguments + " -Xmx" + SetingClass.sram + " -Dfml.ignoreInvalidMinecraftCertificates=true -Dfml.ignorePatchDiscrepancies=true -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:-UseAdaptiveSizePolicy -Xmn128M -Djava.library.path=\"" + SetingClass.pDir + "\\" + SetingClass.gDir + "\\bin\\natives\" -cp \"" + MineLib + "\";\"" + SetingClass.pDir + "\\" + SetingClass.gDir + "\\bin\\minecraft.jar\" net.minecraft.launchwrapper.Launch --username " + SetingClass.login + " --gameDir \"" + SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + "\" --version \"" + SetingClass.selectedBuild.Name + "\" --assetsDir \"" + SetingClass.pDir + "\\" + SetingClass.gDir + "\\assets\" --assetIndex " + "1.7.10" + " --accessToken " + SetingClass.accessToken + " --uuid " + SetingClass.uuid + " --userProperties [] --userType mojang --tweakClass com.mumfrey.liteloader.launch.LiteLoaderTweaker " + forge + server + shaders;
-                proc.StartInfo.RedirectStandardOutput = true;
-                proc.StartInfo.RedirectStandardError = true;
-                proc.StartInfo.RedirectStandardInput = true;
+                proc.StartInfo.Arguments = SetingClass.dopArguments + " -Xmx" + SetingClass.sram + " -Dfml.ignoreInvalidMinecraftCertificates=true -Dfml.ignorePatchDiscrepancies=true -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:-UseAdaptiveSizePolicy -Xmn128M -Djava.library.path=\"" + SetingClass.pDir + "\\" + SetingClass.gDir + "\\bin\\natives\" -cp \"" + MineLib + "\";\"" + SetingClass.pDir + "\\" + SetingClass.gDir + "\\bin\\minecraft.jar\" net.minecraft.launchwrapper.Launch --username " + SetingClass.login + " --gameDir \"" + SetingClass.pDir + "\\" + SetingClass.gDir + "\\builds\\" + SetingClass.selectedBuild.ID + "\" --version \"" + SetingClass.selectedBuild.Name + "\" --assetsDir \"" + SetingClass.pDir + "\\" + SetingClass.gDir + "\\assets\" --assetIndex " + "1.7.10" + " --accessToken " + SetingClass.accessToken + " --uuid " + SetingClass.uuid + " --userProperties [] --userType mojang " + liteMod + forge + server + shaders;
+                if (!SetingClass.showConsole)
+                {
+                    proc.StartInfo.RedirectStandardOutput = true;
+                    proc.StartInfo.RedirectStandardError = true;
+                    proc.StartInfo.RedirectStandardInput = true;
+                    proc.StartInfo.CreateNoWindow = true;
+                }
                 proc.StartInfo.UseShellExecute = false;
-                proc.StartInfo.CreateNoWindow = true;
                 proc.StartInfo.WorkingDirectory = SetingClass.pDir + "\\" + SetingClass.gDir;
                 proc.Start();
             }
