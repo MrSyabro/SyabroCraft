@@ -21,7 +21,7 @@ namespace WindowsFormsApplication1
         public string repoLinc = @"http://syabrocraft.xyz/wp-content/minecraft/";
         public string versLinc = @"http://syabrocraft.xyz/wp-content/plugins/syabrocraft/version_change.php";
         public Uri libLinc;
-        StreamWriter logFile = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SyabroCraft\\LauncherLog.log", true);
+        
 
         public Form1()
         {
@@ -54,8 +54,8 @@ namespace WindowsFormsApplication1
                 {
                     libLinc = new Uri(repoLinc + "libraries32.json");
                 }
-                Directory.CreateDirectory(gPath + "\\libraries\\"); writeToLog("[" + DateTime.Today + "]: Создание папки " + gPath + "\\libraries\\");
-                
+                Directory.CreateDirectory(gPath + "\\libraries\\");
+
                 HttpWebRequest libsListWebRequest = (HttpWebRequest)WebRequest.Create(libLinc);
                 HttpWebResponse libsListWebResponse = (HttpWebResponse)libsListWebRequest.GetResponse();
                 Stream ReceiveStream = libsListWebResponse.GetResponseStream();
@@ -101,19 +101,11 @@ namespace WindowsFormsApplication1
                 setings.shaders = false;
                 setings.forge = true;
                 setings.mLogs = false;
+                setings.buildAutoSync = true;
                 File.WriteAllText(gPath + "\\seting.json", jss.Serialize(setings));
             }
             catch (Exception ex) {
-                MessageBox.Show("Произошла ошибка, пожалуйста, отправте файл логов \"...\\Roaming\\SyabroCraft\\LauncherLog.log\" на форум разработчика.");
-                writeToLog("[" + DateTime.Today + "]: Произошал ошибка: ");
-                writeToLog("Сообщение: " + ex.Message);
-                writeToLog("Исключение из: " + ex.TargetSite);
-                writeToLog("Информация: " + ex.Data);
-                writeToLog("Стек: " + ex.StackTrace);
-                Process.Start(gPath);
-                Process.Start("http://syabrocraft.xyz/forums/forum/%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81-%D0%BE%D1%82%D0%B2%D0%B5%D1%82/");
-                logFile.Close();
-                Close();
+                logError(ex);
             }
         }
 
@@ -150,7 +142,7 @@ namespace WindowsFormsApplication1
                     List<Lib> libList = jss.Deserialize<List<Lib>>(libListJSON);
                     foreach (Lib lib in libList)
                     {
-                        backgroundWorker1.ReportProgress(0, lib.name);
+                        backgroundWorker2.ReportProgress(0, lib.name);
                         client.DownloadFile(repoLinc + "libs/" + lib.name, gPath + "\\libraries\\" + lib.name);
                     }
                 }
@@ -181,7 +173,7 @@ namespace WindowsFormsApplication1
 
                 if (!Directory.Exists(gPath + "\\assets"))
                 {
-                    backgroundWorker1.ReportProgress(0, "Загрузка ресурсов...");
+                    backgroundWorker2.ReportProgress(0, "Загрузка ресурсов...");
                     HttpWebRequest assetsListWebRequest = (HttpWebRequest)WebRequest.Create(repoLinc + "/assets.json");
                     HttpWebResponse assetsListWebResponse = (HttpWebResponse)assetsListWebRequest.GetResponse();
                     Stream assetsListReceiveStream = assetsListWebResponse.GetResponseStream();
@@ -231,6 +223,7 @@ namespace WindowsFormsApplication1
                     setings.shaders = false;
                     setings.forge = true;
                     setings.mLogs = false;
+                    setings.buildAutoSync = true;
                     File.WriteAllText(gPath + "\\seting.json", jss.Serialize(setings));
                 }
                 else
@@ -247,29 +240,27 @@ namespace WindowsFormsApplication1
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Произошла ошибка, пожалуйста, отправте файл логов \"...\\Roaming\\SyabroCraft\\LauncherLog.log\" на форум разработчика.");
-                writeToLog("[" + DateTime.Today + "]: Произошал ошибка: ");
-                writeToLog("Сообщение: " + ex.Message);
-                writeToLog("Исключение из: " + ex.TargetSite);
-                writeToLog("Информация: " + ex.Data);
-                writeToLog("Стек: " + ex.StackTrace);
-                Process.Start("http://syabrocraft.xyz/forums/forum/%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81-%D0%BE%D1%82%D0%B2%D0%B5%D1%82/");
-                Process.Start(gPath);
-                logFile.Close();
-                Close();
+                logError(ex);
             }
         }
 
         private void backgroundWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
-            Process.Start(gPath + "\\Launcher.exe");
-            logFile.Close();
+            if (File.Exists(gPath + "\\Launcher.exe")) Process.Start(gPath + "\\Launcher.exe");
             Close();
         }
 
-        private void writeToLog(string text)
+        private void logError(Exception ex)
         {
-            logFile.WriteLine(text);
+            MessageBox.Show("Произошла ошибка, пожалуйста, отправте файл логов \"...\\Roaming\\SyabroCraft\\LauncherLog.log\" на форум разработчика.");
+            string errorLog = "[" + DateTime.Today + "]: Произошал ошибка: \n" +
+                "Сообщение: " + ex.Message + "\n" +
+                "Исключение из: " + ex.TargetSite + "\n" +
+                "Информация: " + ex.Data + "\n" +
+                "Стек: " + ex.StackTrace + "\n";
+            Process.Start("http://syabrocraft.xyz/forums/forum/%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81-%D0%BE%D1%82%D0%B2%D0%B5%D1%82/");
+            Process.Start(gPath);
+            File.WriteAllText(gPath + "\\LauncherLog.log", errorLog);
         }
 
         private static string POST(string Url, string Data)
@@ -338,5 +329,6 @@ namespace WindowsFormsApplication1
         public int updater_version;
         public bool lLogs;
         public bool mLogs;
+        public bool buildAutoSync;
     }
 }

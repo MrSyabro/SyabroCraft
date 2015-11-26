@@ -35,6 +35,7 @@ namespace System
                 } else
                 {
                     startGame();
+                    Close();
                 }
             } else {
                 label2.Text = "Загрузка сборки...";
@@ -82,15 +83,7 @@ namespace System
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Произошла ошибка, пожалуйста, отправте файл логов \"...\\Roaming\\SyabroCraft\\LauncherLog.log\" на форум разработчика.");
-                AuthWindow.writeToLog("[" + DateTime.Today + "]: Произошал ошибка: ");
-                AuthWindow.writeToLog("Сообщение: " + ex.Message);
-                AuthWindow.writeToLog("Исключение из: " + ex.TargetSite);
-                AuthWindow.writeToLog("Информация: " + ex.Data);
-                AuthWindow.writeToLog("Стек: " + ex.StackTrace);
-                Process.Start(SetingClass.pDir + "\\" + SetingClass.gDir);
-                Process.Start("http://syabrocraft.xyz/forums/forum/%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81-%D0%BE%D1%82%D0%B2%D0%B5%D1%82/");
-                AuthWindow.logFile.Close();
+                logError(ex);
                 Close();
             }
             //label2.Text = "Читаю логи.. :)";
@@ -123,15 +116,7 @@ namespace System
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Произошла ошибка", "Произошла ошибка, пожалуйста, отправте файл логов \"...\\Roaming\\SyabroCraft\\LauncherLog.log\" на форум разработчика.");
-                AuthWindow.writeToLog("[" + DateTime.Today + "]: Произошал ошибка: ");
-                AuthWindow.writeToLog("Сообщение: " + ex.Message);
-                AuthWindow.writeToLog("Исключение из: " + ex.TargetSite);
-                AuthWindow.writeToLog("Информация: " + ex.Data);
-                AuthWindow.writeToLog("Стек: " + ex.StackTrace);
-                Process.Start(SetingClass.pDir + "\\" + SetingClass.gDir);
-                Process.Start("http://syabrocraft.xyz/forums/forum/%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81-%D0%BE%D1%82%D0%B2%D0%B5%D1%82/");
-                AuthWindow.logFile.Close();
+                logError(ex);
                 Close();
             }
         }
@@ -198,7 +183,8 @@ namespace System
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Ошибка при загрузке сборки");
+                logError(ex);
+                Close();
             }
         }
 
@@ -225,9 +211,17 @@ namespace System
             label2.Text = e.UserState as String;
         }
 
-        private void proc_ErrorDataReceived(object sender, Diagnostics.DataReceivedEventArgs e)
+        private void logError(Exception ex)
         {
-            AuthWindow.writeToLog(sender as string);
+            MessageBox.Show("Произошла ошибка, пожалуйста, отправте файл логов \"...\\Roaming\\SyabroCraft\\LauncherLog.log\" на форум разработчика.");
+            string errorLog = "[" + DateTime.Today + "]: Произошал ошибка: \n" +
+                "Сообщение: " + ex.Message + "\n" +
+                "Исключение из: " + ex.TargetSite + "\n" +
+                "Информация: " + ex.Data + "\n" +
+                "Стек: " + ex.StackTrace + "\n";
+            Process.Start("http://syabrocraft.xyz/forums/forum/%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81-%D0%BE%D1%82%D0%B2%D0%B5%D1%82/");
+            Process.Start(SetingClass.pDir + "\\" + SetingClass.gDir);
+            File.WriteAllText(SetingClass.pDir + "\\" + SetingClass.gDir + "\\LauncherLog.log", errorLog);
         }
     }
     class BuildInfo

@@ -90,8 +90,6 @@
             this.proc.StartInfo.StandardOutputEncoding = null;
             this.proc.StartInfo.UserName = "";
             this.proc.SynchronizingObject = this;
-            this.proc.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(this.proc_ErrorDataReceived);
-            this.proc.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(this.proc_ErrorDataReceived);
             // 
             // CheckBuild
             // 

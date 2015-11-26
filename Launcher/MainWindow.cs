@@ -7,6 +7,7 @@ using System.Net;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
 using System.Text;
+using System.Diagnostics;
 
 namespace Launcher
 {
@@ -45,7 +46,7 @@ namespace Launcher
         private void Form1_Load(object sender, EventArgs e)
         {
             if (!SetingClass.buildAutoSync)
-                if (MessageBox.Show("Синхронизация сборок отключена!", "Предупреждение", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                if (MessageBox.Show("Синхронизация сборок отключена! Хотите ее включить?", "Предупреждение!", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     SetingClass.buildAutoSync = true;
                     saveSetings();
@@ -70,7 +71,7 @@ namespace Launcher
                         serverSelector.Text = SetingClass.oldServer;
                 }
             }
-            catch(Exception ex) { MessageBox.Show(ex.Message); }
+            catch(Exception ex) { logError(ex); Close(); }
 
             
         }
@@ -148,6 +149,20 @@ namespace Launcher
             }
             serverSelector.Items.Add("");
         }
+
+        private void logError(Exception ex)
+        {
+            MessageBox.Show("Произошла ошибка, пожалуйста, отправте файл логов \"...\\Roaming\\SyabroCraft\\LauncherLog.log\" на форум разработчика.");
+            string errorLog = "[" + DateTime.Today + "]: Произошал ошибка: \n" +
+                "Сообщение: " + ex.Message + "\n" +
+                "Исключение из: " + ex.TargetSite + "\n" +
+                "Информация: " + ex.Data + "\n" +
+                "Стек: " + ex.StackTrace + "\n";
+            Process.Start("http://syabrocraft.xyz/forums/forum/%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81-%D0%BE%D1%82%D0%B2%D0%B5%D1%82/");
+            Process.Start(SetingClass.pDir + "\\" + SetingClass.gDir);
+            File.WriteAllText(SetingClass.pDir + "\\" + SetingClass.gDir + "\\LauncherLog.log", errorLog);
+        }
+
         public static void saveSetings()
         {
             SerSetingsClass serSetings = new SerSetingsClass();

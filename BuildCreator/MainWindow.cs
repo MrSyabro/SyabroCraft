@@ -20,13 +20,13 @@ namespace BuildCreator
 
         private void MainWindow_Show(object sender, EventArgs e)
         {
-            foreach(string buildPath in Directory.GetDirectories(gamePath + "builds\\"))
+            if (Directory.Exists(gamePath + "builds\\")) foreach(string buildPath in Directory.GetDirectories(gamePath + "builds\\"))
             {
                 string buildFolder = new DirectoryInfo(buildPath).Name;
                 buildsSelector.Items.Add(buildFolder);
             }
-            libFileList.Items.AddRange(Directory.GetFiles(gamePath + "libraries\\", "*.jar"));
-            assetsListBox.Items.AddRange(Directory.GetFiles(gamePath + "assets\\", "*", SearchOption.AllDirectories));
+            if (Directory.Exists(gamePath + "libraries\\")) libFileList.Items.AddRange(Directory.GetFiles(gamePath + "libraries\\", "*.jar"));
+            if (Directory.Exists(gamePath + "assets\\")) assetsListBox.Items.AddRange(Directory.GetFiles(gamePath + "assets\\", "*", SearchOption.AllDirectories));
         }
 
         private void buildsSelector_SelectedIndexChanged(object sender, EventArgs e)
