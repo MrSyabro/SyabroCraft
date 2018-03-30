@@ -1,0 +1,18 @@
+﻿<Window x:Name="AuthWindow1" x:Class="Launcher.AuthWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Launcher"
+        mc:Ignorable="d"
+        Title="AuthWindow" Height="150" ResizeMode="NoResize" Width="200">
+    <Grid>
+        <PasswordBox x:Name="passwordBox" Margin="10,35,10,0" VerticalAlignment="Top" FontSize="14" d:LayoutOverrides="VerticalAlignment" Password="Password" MouseLeftButtonDown="passwordBox_MouseLeftButtonDown" Height="20"/>
+        <Button x:Name="authButton" Content="Вход" Margin="10,0,0,10" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="40" Click="button_Click"/>
+        <Button x:Name="regButton" Content="Регистрация" Margin="0,0,10,10" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="80" Click="regButton_Click"/>
+        <CheckBox x:Name="AECheckBox" Content="Входить автоматически" Margin="10,60,10,0" VerticalAlignment="Top" IsChecked="True"/>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="35,5,0,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <TextBox x:Name="loginBox" Height="20" Margin="10,10,10,0" Text="Login" VerticalAlignment="Top" UndoLimit="10" MaxLines="1" MaxLength="10" TextDecorations="{x:Null}" FontSize="14" TextAlignment="Center" ToolTip="Пожалуйста, введи свой логин" MouseLeftButtonDown="loginBox_MouseLeftButtonDown"/>
+
+    </Grid>
+</Window>
